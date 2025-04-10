@@ -14,7 +14,6 @@ def weather_view(request):
         city = request.GET.get('city', 'Warsaw')
         api = WeatherAPI()
         weather_data = api.get_weather('current', city)
-        # Proste przetwarzanie - tylko kluczowe dane
         context = {
             'city': city,
             'temperature': round(weather_data['main']['temp'], 1),
