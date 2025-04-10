@@ -20,5 +20,6 @@ from core import views
 from core.views import index
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('app/', views.weather_view, name='weather'),
+    path('', views.index, name='index'),
+    path('weather/', views.weather_view, name='weather_view'),
 ]

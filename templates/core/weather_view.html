@@ -1,0 +1,53 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Pogoda dla {{ city }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg my-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="text-center mb-0">
+                    <i class="fas fa-cloud-sun me-2"></i>
+                    Pogoda dla: {{ city }}
+                </h2>
+            </div>
+            
+            {% if success %}
+            <div class="card-body text-center">
+                <img src="http://openweathermap.org/img/wn/{{ icon }}@4x.png" 
+                     alt="{{ description }}" class="mb-4">
+                
+                <div class="display-2 mb-3">{{ temperature }}°C</div>
+                <h3 class="text-capitalize">{{ description }}</h3>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="p-3">
+                            <i class="fas fa-tint me-2"></i>
+                            Wilgotność: {{ humidity }}%
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3">
+                            <i class="fas fa-wind me-2"></i>
+                            Wiatr: {{ wind_speed }} km/h
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    {{ error }}
+                </div>
+                <a href="{% url 'index' %}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-1"></i> Spróbuj ponownie
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

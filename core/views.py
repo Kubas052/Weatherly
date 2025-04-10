@@ -1,23 +1,29 @@
-from django.http import HttpResponse
 from django.shortcuts import render
+
 
 # Create your views here.
 from .utils.weather_api import WeatherAPI
 def index(request):
     return render(request, 'core/index.html')
 
+
 def weather_view(request):
-    city = request.GET.get('city', 'Warsaw')
-    weather_api = WeatherAPI()
+    context = {'success': False}
 
     try:
-        current_weather  = weather_api.get_current_weather(city)
-        weather_text = f"""
-        Current weather in {city}:
-        Temperature: {current_weather['main']['temp']}
-        Conditions: {current_weather['weather'][0]['description']}
-        Humidity: {current_weather['main']['humidity']}%
-        """
-        return HttpResponse(weather_text, content_type="text/plain")
+        city = request.GET.get('city', 'Warsaw')
+        api = WeatherAPI()
+        weather_data = api.get_weather('current', city)
+        # Proste przetwarzanie - tylko kluczowe dane
+        context = {
+            'city': city,
+            'temperature': round(weather_data['main']['temp'], 1),
+            'description': weather_data['weather'][0]['description'].capitalize(),
+            'icon': weather_data['weather'][0]['icon'],
+            'humidity': weather_data['main']['humidity'],
+            'wind_speed': weather_data['wind']['speed'],
+            'success': True
+        }
     except Exception as e:
-        return HttpResponse(f"Error: {str(e)}", content_type="text/plain")
+        context['error'] = f"Błąd: {str(e)}"
+    return render(request, 'core/weather_view.html', context)
