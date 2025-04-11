@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from datetime import datetime
+from django.http import JsonResponse
 
 # Create your views here.
 from .utils.weather_api import WeatherAPI
@@ -11,8 +12,13 @@ def weather_view(request):
     context = {'success': False}
 
     try:
-        city = request.GET.get('city', 'Warsaw')
-        view_type = request.GET.get('view_type')
+        city = request.GET.get('city')  or 'Warsaw'
+        historical_start_date = request.GET.get('historical_start_date') or 'None'
+        historical_length = request.GET.get('historical_length') or 'None'
+        view_type = request.GET.get('view_type') or 'current'
+        print(view_type)
+        print(historical_length)
+        print(historical_start_date)
         api = WeatherAPI()
         weather_data = api.get_weather(view_type, city)
         if view_type == 'current':
@@ -31,11 +37,9 @@ def weather_view(request):
             for i, hour_data in enumerate(weather_data['list']):
                 dt = hour_data['dt']
                 hour = datetime.fromtimestamp(dt).strftime('%H:%M')
-                print(hour)
                 if i > 0:
                     prev_dt = weather_data['list'][i - 1]['dt']
                     delta_hours = int((dt - prev_dt) / 3600)
-                    print(delta_hours)
                     historical_list.append({
                         'hour': hour,
                         'temp': round(hour_data['main']['temp'], 1),
@@ -51,9 +55,12 @@ def weather_view(request):
 
             context = {
                 'city': city,
-                'forecast_list': historical_list,
+                'forecast_data': historical_list,
                 'success': True
             }
-            return render(request, 'core/historical_view.html', {'context': context})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse(context)
+            return render(request, 'core/historical_view.html', context)
+
     except Exception as e:
         context['error'] = f"Błąd: {str(e)}"

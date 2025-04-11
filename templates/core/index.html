@@ -14,6 +14,8 @@
                 <form method="get" action="{% url 'weather_view' %}" class="needs-validation" novalidate> #GET HERE
                     {% csrf_token %}
                     <input type="hidden" name="view_type" id="viewTypeInput" value="">
+                    <input type="hidden" name="historical_start_date" id="historicalStartDate" value="">
+                    <input type="hidden" name="historical_length" id="historicalLength" value="">
                     <div class="input-group mb-3">
                         <input type="text" class="form-control form-control-lg"
                                name="city" placeholder="Wpisz nazwę miejscowości..." required>
@@ -28,13 +30,13 @@
                     {{ error }}
                 </div>
                 {% endif %}
-                <div class="container mt-4">
+                <div class="container mt-4" id="weatherDiv">
                     <!-- Przełącznik -->
                     <div class="btn-group w-100 mb-4" role="group" id="weatherToggle">
                             <button class="btn btn-outline-primary" data-type="current">
                                 <i class="fas fa-sun"></i> Current
                             </button>
-                            <button class="btn btn-outline-primary" data-type="forecast/daily">
+                            <button class="btn btn-outline-primary" data-type="forecast">
                                 <i class="fas fa-cloud-sun"></i> Forecast
                             </button>
                             <button class="btn btn-outline-primary" data-type="historical">
@@ -44,28 +46,72 @@
                                 <i class="fas fa-calendar-alt"></i> Maps
                             </button>
                     </div>
+{#                    I have no idea why, but it won't work in 1 div :v#}
+{#                    spent too much time debugging this#}
+{#                    TODO do it in 1 div, not cols#}
+                    <div id="forecastFields" style="display: none;" class="mt-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button class="btn btn-outline-primary w-100" data-type="hourly">
+                                    <i class="fas fa-cloud-sun"></i> Hourly (5 days)
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-outline-primary w-100" data-type="daily">
+                                    <i class="fas fa-cloud-sun"></i> Daily (16 days)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="historicalFields" style="display: none;" class="mt-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="historicalDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="historicalDate">
+                                <div class="invalid-feedback">Date cannot be older than 1 year from today.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="historicalDays" class="form-label">Days (1-7)</label>
+                                <input type="number" class="form-control" id="historicalDays" min="1" max="7">
+                                <div class="invalid-feedback">Please enter a number between 1 and 7.</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                     <script>
-                      const buttons = document.querySelectorAll('#weatherToggle button');
+                        const buttons = document.querySelectorAll('#weatherDiv button');
+                        const defaultType = "forecast";
+                        buttons.forEach(btn => {
+                            document.querySelector('[data-type="current"]').classList.replace
+                            ('btn-outline-primary', 'btn-primary');
+                            btn.addEventListener('click', () => {
+                                buttons.forEach(b => b.classList.remove('btn-primary'));
+                                buttons.forEach(b => b.classList.add('btn-outline-primary'));
 
-                      buttons.forEach(btn => {
-                        btn.addEventListener('click', () => {
-                          // Usuwamy aktywne zaznaczenie ze wszystkich
-                          buttons.forEach(b => b.classList.remove('btn-primary'));
-                          buttons.forEach(b => b.classList.add('btn-outline-primary'));
+                                btn.classList.remove('btn-outline-primary');
+                                btn.classList.add('btn-primary');
+                                const dateInput = document.getElementById('historicalDate');
+                                const daysInput = document.getElementById('historicalDays');
+                                const days = parseInt(daysInput.value);
+                                if (days<7 && days>1) {historicalLength.value = daysInput.value}
+                                else {historicalLength.value = 1}
+                                {#TODO historicalStartDate validation#}
+                                historicalStartDate.value = dateInput.value
+                                const type = btn.getAttribute('data-type');
+                                viewTypeInput.value = type;
+                                if (type === 'historical') {
+                                    historicalFields.style.display = 'block';
+                                    forecastFields.style.display = 'none';
+                                } else if (type === 'forecast' || type === 'hourly' || type === 'daily') {
+                                    forecastFields.style.display = 'block';
+                                    historicalFields.style.display = 'none';
 
-                          // Dodajemy aktywne zaznaczenie do klikniętego
-                          btn.classList.remove('btn-outline-primary');
-                          btn.classList.add('btn-primary');
-
-                          // Tutaj możesz np. wykonać akcję AJAX lub zmienić zawartość
-                          const selectedType = btn.getAttribute('data-type');
-                          console.log("Kliknięto typ: " + selectedType);
-                          const type = btn.getAttribute('data-type');
-                          viewTypeInput.value = type;
-                          // Możesz np. zmienić widok, załadować dane itd.
+                                } else {
+                                    historicalFields.style.display = 'none';
+                                    forecastFields.style.display = 'none';
+                                }
+                            });
                         });
-                      });
                     </script>
                 <div class="mt-4">
                     <h5 class="text-muted">Popularne lokalizacje:</h5>
