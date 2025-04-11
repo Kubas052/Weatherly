@@ -11,8 +11,9 @@
                 <h2 class="text-center mb-0"><i class="fas fa-search-location me-2"></i>Wyszukaj Miejscowość</h2>
             </div>
             <div class="card-body">
-                <form method="get" action="{% url 'weather_view' %}" class="needs-validation" novalidate>
+                <form method="get" action="{% url 'weather_view' %}" class="needs-validation" novalidate> #GET HERE
                     {% csrf_token %}
+                    <input type="hidden" name="view_type" id="viewTypeInput" value="">
                     <div class="input-group mb-3">
                         <input type="text" class="form-control form-control-lg"
                                name="city" placeholder="Wpisz nazwę miejscowości..." required>
@@ -29,17 +30,43 @@
                 {% endif %}
                 <div class="container mt-4">
                     <!-- Przełącznik -->
-                    <div class="btn-group w-100 mb-4" role="group">
-                        <a href="?type=current&city={{ city }}"
-                           class="btn btn-{% if view_type == 'current' %}primary{% else %}outline-primary{% endif %}">
-                            <i class="fas fa-sun"></i> Aktualna pogoda
-                        </a>
-                        <a href="?type=forecast&city={{ city }}"
-                           class="btn btn-{% if view_type == 'forecast' %}primary{% else %}outline-primary{% endif %}">
-                            <i class="fas fa-calendar-alt"></i> Prognoza
-                        </a>
+                    <div class="btn-group w-100 mb-4" role="group" id="weatherToggle">
+                            <button class="btn btn-outline-primary" data-type="current">
+                                <i class="fas fa-sun"></i> Current
+                            </button>
+                            <button class="btn btn-outline-primary" data-type="forecast/daily">
+                                <i class="fas fa-cloud-sun"></i> Forecast
+                            </button>
+                            <button class="btn btn-outline-primary" data-type="historical">
+                                <i class="fas fa-history"></i> Historical
+                            </button>
+                            <button class="btn btn-outline-primary" data-type="maps">
+                                <i class="fas fa-calendar-alt"></i> Maps
+                            </button>
                     </div>
                 </div>
+                    <script>
+                      const buttons = document.querySelectorAll('#weatherToggle button');
+
+                      buttons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                          // Usuwamy aktywne zaznaczenie ze wszystkich
+                          buttons.forEach(b => b.classList.remove('btn-primary'));
+                          buttons.forEach(b => b.classList.add('btn-outline-primary'));
+
+                          // Dodajemy aktywne zaznaczenie do klikniętego
+                          btn.classList.remove('btn-outline-primary');
+                          btn.classList.add('btn-primary');
+
+                          // Tutaj możesz np. wykonać akcję AJAX lub zmienić zawartość
+                          const selectedType = btn.getAttribute('data-type');
+                          console.log("Kliknięto typ: " + selectedType);
+                          const type = btn.getAttribute('data-type');
+                          viewTypeInput.value = type;
+                          // Możesz np. zmienić widok, załadować dane itd.
+                        });
+                      });
+                    </script>
                 <div class="mt-4">
                     <h5 class="text-muted">Popularne lokalizacje:</h5>
                     <div class="d-flex flex-wrap gap-2">
