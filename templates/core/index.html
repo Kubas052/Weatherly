@@ -80,37 +80,96 @@
                 </div>
                     <script>
                         const buttons = document.querySelectorAll('#weatherDiv button');
-                        const defaultType = "forecast";
-                        buttons.forEach(btn => {
-                            document.querySelector('[data-type="current"]').classList.replace
-                            ('btn-outline-primary', 'btn-primary');
-                            btn.addEventListener('click', () => {
-                                buttons.forEach(b => b.classList.remove('btn-primary'));
-                                buttons.forEach(b => b.classList.add('btn-outline-primary'));
+                        const viewTypeInput = document.getElementById('viewTypeInput');
+                        const historicalStartDate = document.getElementById('historicalStartDate');
+                        const historicalLength = document.getElementById('historicalLength');
+                        const historicalDate = document.getElementById('historicalDate');
+                        const historicalDays = document.getElementById('historicalDays');
+                        const forecastFields = document.getElementById('forecastFields');
+                        const historicalFields = document.getElementById('historicalFields');
+                        const weatherForm = document.querySelector('form');
+                        
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const today = new Date();
+                            const formattedDate = today.toISOString().split('T')[0];
+                            document.getElementById('historicalDate').value = formattedDate;
+                            
+                            document.getElementById('historicalDays').value = '1';
+                            
+                            document.getElementById('historicalStartDate').value = formattedDate;
+                            document.getElementById('historicalLength').value = '1';
+                        });
 
+                        // Ustaw domyślną wartość na 'current'
+                        viewTypeInput.value = 'current';
+                        document.querySelector('[data-type="current"]').classList.replace('btn-outline-primary', 'btn-primary');
+                    
+                        // Obsługa przycisków
+                        buttons.forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                buttons.forEach(b => {
+                                    b.classList.remove('btn-primary');
+                                    b.classList.add('btn-outline-primary');
+                                });
+                    
                                 btn.classList.remove('btn-outline-primary');
                                 btn.classList.add('btn-primary');
-                                const dateInput = document.getElementById('historicalDate');
-                                const daysInput = document.getElementById('historicalDays');
-                                const days = parseInt(daysInput.value);
-                                if (days<7 && days>1) {historicalLength.value = daysInput.value}
-                                else {historicalLength.value = 1}
-                                {#TODO historicalStartDate validation#}
-                                historicalStartDate.value = dateInput.value
+                                
                                 const type = btn.getAttribute('data-type');
                                 viewTypeInput.value = type;
+                    
                                 if (type === 'historical') {
                                     historicalFields.style.display = 'block';
                                     forecastFields.style.display = 'none';
                                 } else if (type === 'forecast' || type === 'hourly' || type === 'daily') {
                                     forecastFields.style.display = 'block';
                                     historicalFields.style.display = 'none';
-
                                 } else {
                                     historicalFields.style.display = 'none';
                                     forecastFields.style.display = 'none';
                                 }
                             });
+                        });
+                    
+                        // Walidacja i ustawienie wartości przed wysłaniem formularza
+                        weatherForm.addEventListener('submit', function(e) {
+                            // Jeśli wybrano historical, sprawdź poprawność danych
+                            if (viewTypeInput.value === 'historical') {
+                                const today = new Date();
+                                const selectedDate = new Date(historicalDate.value);
+                                const oneYearAgo = new Date();
+                                oneYearAgo.setFullYear(today.getFullYear() - 1);
+                                
+                                // Sprawdź czy data jest w zakresie ostatniego roku
+                                if (selectedDate > today || selectedDate < oneYearAgo) {
+                                    historicalDate.classList.add('is-invalid');
+                                    e.preventDefault();
+                                    return false;
+                                }
+                                
+                                // Sprawdź liczbę dni
+                                const days = parseInt(historicalDays.value);
+                                if (isNaN(days) || days < 1 || days > 7) {
+                                    historicalDays.classList.add('is-invalid');
+                                    e.preventDefault();
+                                    return false;
+                                }
+                                
+                                // Ustaw wartości
+                                historicalStartDate.value = historicalDate.value;
+                                historicalLength.value = days;
+                            }
+                            
+                            return true;
+                        });
+                    
+                        // Resetowanie walidacji przy zmianie wartości
+                        historicalDate.addEventListener('input', function() {
+                            this.classList.remove('is-invalid');
+                        });
+                        
+                        historicalDays.addEventListener('input', function() {
+                            this.classList.remove('is-invalid');
                         });
                     </script>
                 <div class="mt-4">

@@ -13,15 +13,15 @@
                     Pogoda dla: {{ city }}
                 </h2>
             </div>
-            
+
             {% if success %}
             <div class="card-body text-center">
-                <img src="http://openweathermap.org/img/wn/{{ icon }}@4x.png" 
+                <img src="http://openweathermap.org/img/wn/{{ icon }}@4x.png"
                      alt="{{ description }}" class="mb-4">
-                
+
                 <div class="display-2 mb-3">{{ temperature }}°C</div>
                 <h3 class="text-capitalize">{{ description }}</h3>
-                
+
                 <div class="row mt-4">
                     <div class="col-md-6">
                         <div class="p-3">

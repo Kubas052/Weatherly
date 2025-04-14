@@ -31,12 +31,12 @@
     </style>
 </head>
 <body>
-    <h1>Prognoza temperatury dla <span id="city-name">{{ city|title }}</span></h1>
-    
+    <h1>Historia temperatury dla <span id="city-name">{{ city|title }}</span></h1>
+
     <div class="chart-container">
         <canvas id="temperatureChart"></canvas>
     </div>
-    
+
     <table id="forecast-table">
         <thead>
             <tr>
@@ -58,38 +58,38 @@
             // Dane z Django
             const forecastData = {{ forecast_data|safe }};
             const cityName = "{{ city|title }}";
-            
+
             // Jeśli dane są dostępne, rysuj wykres i tabelę
             if (forecastData && forecastData.length > 0) {
                 drawTemperatureChart(forecastData, cityName);
                 populateForecastTable(forecastData);
             }
-            
+
             // Funkcja do rysowania wykresu
             function drawTemperatureChart(data, city) {
                 const canvas = document.getElementById('temperatureChart');
                 const ctx = canvas.getContext('2d');
-                
+
                 // Ustaw rzeczywisty rozmiar canvas
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
-                
+
                 // Przygotowanie danych
                 const hours = data.map(item => item.hour);
                 const temperatures = data.map(item => item.temp);
                 const feelsLike = data.map(item => item.feels_like);
-                
+
                 // Obliczenia dla osi i skalowania
                 const padding = 40;
                 const chartWidth = canvas.width - 2 * padding;
                 const chartHeight = canvas.height - 2 * padding;
-                
+
                 const maxTemp = Math.max(...temperatures, ...feelsLike);
                 const minTemp = Math.min(...temperatures, ...feelsLike);
                 const tempRange = maxTemp - minTemp;
-                
+
                 const scaleY = value => chartHeight - ((value - minTemp) / tempRange) * chartHeight + padding;
-                
+
                 // Rysowanie osi
                 ctx.beginPath();
                 ctx.moveTo(padding, padding);
@@ -97,48 +97,48 @@
                 ctx.lineTo(canvas.width - padding, canvas.height - padding);
                 ctx.strokeStyle = '#333';
                 ctx.stroke();
-                
+
                 // Linie pomocnicze i etykiety osi Y
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#333';
                 ctx.font = '12px Arial';
-                
+
                 const steps = 5;
                 for (let i = 0; i <= steps; i++) {
                     const temp = minTemp + (i / steps) * tempRange;
                     const y = scaleY(temp);
-                    
+
                     ctx.beginPath();
                     ctx.moveTo(padding - 5, y);
                     ctx.lineTo(padding, y);
                     ctx.stroke();
-                    
+
                     ctx.fillText(temp.toFixed(1), padding - 10, y + 4);
                 }
-                
+
                 // Etykiety osi X (godziny)
                 ctx.textAlign = 'center';
                 const step = Math.max(1, Math.floor(hours.length / 10));
-                
+
                 for (let i = 0; i < hours.length; i += step) {
                     const x = padding + (i / (hours.length - 1)) * chartWidth;
                     ctx.fillText(hours[i], x, canvas.height - padding + 20);
-                    
+
                     ctx.beginPath();
                     ctx.moveTo(x, canvas.height - padding);
                     ctx.lineTo(x, canvas.height - padding + 5);
                     ctx.stroke();
                 }
-                
+
                 // Rysowanie linii temperatury
                 ctx.beginPath();
                 ctx.strokeStyle = '#e74c3c';
                 ctx.lineWidth = 3;
-                
+
                 for (let i = 0; i < temperatures.length; i++) {
                     const x = padding + (i / (hours.length - 1)) * chartWidth;
                     const y = scaleY(temperatures[i]);
-                    
+
                     if (i === 0) {
                         ctx.moveTo(x, y);
                     } else {
@@ -146,16 +146,16 @@
                     }
                 }
                 ctx.stroke();
-                
+
                 // Rysowanie linii temperatury odczuwalnej
                 ctx.beginPath();
                 ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 3;
-                
+
                 for (let i = 0; i < feelsLike.length; i++) {
                     const x = padding + (i / (hours.length - 1)) * chartWidth;
                     const y = scaleY(feelsLike[i]);
-                    
+
                     if (i === 0) {
                         ctx.moveTo(x, y);
                     } else {
@@ -163,42 +163,42 @@
                     }
                 }
                 ctx.stroke();
-                
+
                 // Legenda
                 ctx.fillStyle = '#e74c3c';
                 ctx.fillRect(canvas.width - 150, 20, 20, 10);
                 ctx.fillStyle = '#333';
                 ctx.fillText('Temperatura', canvas.width - 120, 30);
-                
+
                 ctx.fillStyle = '#3498db';
                 ctx.fillRect(canvas.width - 150, 40, 20, 10);
                 ctx.fillStyle = '#333';
                 ctx.fillText('Odczuwalna', canvas.width - 120, 50);
-                
+
                 // Tytuł wykresu
                 ctx.fillStyle = '#333';
                 ctx.font = 'bold 16px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText(`Prognoza temperatury dla ${city}`, canvas.width / 2, 30);
+                ctx.fillText(`Historia temperatury dla ${city}`, canvas.width / 2, 30);
             }
-            
+
             // Funkcja do wypełniania tabeli
             function populateForecastTable(data) {
                 const tableBody = document.querySelector('#forecast-table tbody');
                 tableBody.innerHTML = '';
-                
+
                 data.forEach(item => {
                     const row = document.createElement('tr');
-                    
+
                     row.innerHTML = `
-                        <td>${item.hour}</td>
+                        <td>${item.datetime}</td>
                         <td>${item.temp}</td>
                         <td>${item.feels_like}</td>
                         <td>${item.humidity}</td>
                         <td>${(item.wind_speed * 3.6).toFixed(1)}</td>
                         <td>${item.description}</td>
                     `;
-                    
+
                     tableBody.appendChild(row);
                 });
             }
