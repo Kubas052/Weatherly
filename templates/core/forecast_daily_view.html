@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prognoza dzienna dla {{ city|title }}</title>
+    <style>
+        .chart-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 20px auto;
+        }
+        canvas {
+            width: 100%;
+            height: 400px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .weather-icon {
+            width: 40px;
+            height: 40px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prognoza dzienna dla <span id="city-name">{{ city|title }}</span></h1>
+
+    <div class="chart-container">
+        <canvas id="temperatureChart"></canvas>
+    </div>
+
+    <table id="forecast-table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Dzień</th>
+                <th>Max (°C)</th>
+                <th>Min (°C)</th>
+                <th>Noc (°C)</th>
+                <th>Wilgotność</th>
+                <th>Wiatr (km/h)</th>
+                <th>Pogoda</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dane zostaną wypełnione przez JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dane z Django
+            const forecastData = {{ forecast_data|safe }};
+            const cityData = {{ city|safe }};
+
+            if (forecastData && forecastData.length > 0) {
+                drawDailyChart(forecastData, cityData);
+                populateDailyTable(forecastData);
+            }
+
+            function drawDailyChart(data, city) {
+                const canvas = document.getElementById('temperatureChart');
+                const ctx = canvas.getContext('2d');
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+
+                // Przygotowanie danych
+                const dates = data.map(item => item.day_name);
+                const maxTemps = data.map(item => item.max_temp);
+                const minTemps = data.map(item => item.min_temp);
+                const nightTemps = data.map(item => item.night_temp);
+
+                // Konfiguracja wykresu
+                const padding = 50;
+                const chartWidth = canvas.width - 2 * padding;
+                const chartHeight = canvas.height - 2 * padding;
+
+                const allTemps = [...maxTemps, ...minTemps, ...nightTemps];
+                const maxTemp = Math.max(...allTemps);
+                const minTemp = Math.min(...allTemps);
+                const tempRange = maxTemp - minTemp;
+
+                const scaleY = value => chartHeight - ((value - minTemp) / tempRange) * chartHeight + padding;
+
+                // Rysowanie osi
+                ctx.beginPath();
+                ctx.moveTo(padding, padding);
+                ctx.lineTo(padding, canvas.height - padding);
+                ctx.lineTo(canvas.width - padding, canvas.height - padding);
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Etykiety osi Y
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#555';
+                ctx.font = '12px Arial';
+                const ySteps = 5;
+                
+                for (let i = 0; i <= ySteps; i++) {
+                    const temp = minTemp + (i / ySteps) * tempRange;
+                    const y = scaleY(temp);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(padding - 5, y);
+                    ctx.lineTo(padding, y);
+                    ctx.stroke();
+                    
+                    ctx.fillText(temp.toFixed(0) + "°C", padding - 10, y + 4);
+                }
+
+                // Etykiety osi X (dni)
+                ctx.textAlign = 'center';
+                dates.forEach((date, i) => {
+                    const x = padding + (i / (dates.length - 1)) * chartWidth;
+                    ctx.fillText(date.substring(0, 3), x, canvas.height - padding + 20);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(x, canvas.height - padding);
+                    ctx.lineTo(x, canvas.height - padding + 5);
+                    ctx.stroke();
+                });
+
+                // Linie temperatur
+                function drawLine(values, color, width) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = width;
+                    
+                    values.forEach((value, i) => {
+                        const x = padding + (i / (values.length - 1)) * chartWidth;
+                        const y = scaleY(value);
+                        
+                        if (i === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    });
+                    ctx.stroke();
+                }
+
+                drawLine(maxTemps, '#e74c3c', 3);
+                drawLine(minTemps, '#3498db', 3);
+                drawLine(nightTemps, '#9b59b6', 2);
+
+                // Legenda
+                function createLegend(text, color, x, y) {
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x, y, 20, 10);
+                    ctx.fillStyle = '#333';
+                    ctx.fillText(text, x + 30, y + 8);
+                }
+
+                createLegend('Maksymalna', '#e74c3c', canvas.width - 180, 30);
+                createLegend('Minimalna', '#3498db', canvas.width - 180, 50);
+                createLegend('Nocna', '#9b59b6', canvas.width - 180, 70);
+
+                // Tytuł
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 18px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Prognoza dzienna dla ${cityData.name}`, canvas.width / 2, 30);
+            }
+
+            function populateDailyTable(data) {
+                const tableBody = document.querySelector('#forecast-table tbody');
+                tableBody.innerHTML = '';
+
+                data.forEach(day => {
+                    const row = document.createElement('tr');
+                    
+                    // Ikona pogody
+                    const iconUrl = `https://openweathermap.org/img/wn/${day.icon}@2x.png`;
+                    
+                    row.innerHTML = `
+                        <td>${day.date}</td>
+                        <td>${day.day_name}</td>
+                        <td>${day.max_temp}°C</td>
+                        <td>${day.min_temp}°C</td>
+                        <td>${day.night_temp}°C</td>
+                        <td>${day.humidity}%</td>
+                        <td>${(day.wind_speed * 3.6).toFixed(1)}</td>
+                        <td>
+                            <img src="${iconUrl}" class="weather-icon" alt="${day.description}">
+                            ${day.description}
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

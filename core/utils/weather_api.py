@@ -54,23 +54,21 @@ class WeatherAPI:
         if request_type == "current":
             endpoint = f"{self.base_url}weather"
         elif request_type == "daily":
+            params.update({"cnt": 16})
             endpoint = f"{self.base_url}forecast/daily"
         elif request_type == "hourly":
             endpoint = f"{self.base_url}forecast/hourly"
         elif request_type == "historical":
-            print("wykonuje sie sekcja historical w weather api")
             date = kwargs.get('date', datetime.now())
             days = min(kwargs.get('days', 1), 7) #Jestem dumny z tego zapisu
             start = int(date.timestamp())
             end = start + days * 86400
             params.update({"start": start, "end": end})
             endpoint = f"{self.history_url}city"
-            print(f"Używana data startowa: {date.isoformat()}")
-            print(f"start = {start}, end = {end}")
 
         else:
             raise ValueError("Nieprawidłowy typ żądania")
 
         params.update(kwargs)
-        print(params)
+        print(f"parametry to: {params}")
         return self._make_request(endpoint, params)
