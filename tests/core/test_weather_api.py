@@ -1,55 +1,80 @@
-''' Tests for weather_api.py, currently from chatGPT'''
-
-from unittest.mock import patch
-from datetime import datetime
 import pytest
+import requests
+from unittest.mock import patch, Mock
+from datetime import datetime, timedelta
 from core.utils.weather_api import WeatherAPI
 
 
-@pytest.fixture
-def api():
-    return WeatherAPI()
+class TestWeatherAPI:
+    """Test suite for WeatherAPI class."""
 
-@patch("core.utils.weather_api.requests.get")
-def test_get_current_weather(mock_get, api):
-    mock_get.return_value.status_code = 200
-    mock_get.return_value.json.return_value = {"weather": "sunny"}
+    @patch.object(WeatherAPI, '_make_request')
+    def test_get_weather_current(self, mock_make_request):
+        """Test get_weather with current weather request."""
+        mock_make_request.return_value = {'current': 'weather'}
+        
+        weather_api = WeatherAPI()
+        result = weather_api.get_weather("current", "Warsaw")
+        
+        assert result == {'current': 'weather'}
+        mock_make_request.assert_called_once_with(
+            f"{weather_api.base_url}weather",
+            {'q': 'Warsaw', 'units': 'metric'}
+        )
 
-    result = api.get_weather("current", "London")
-    assert result == {"weather": "sunny"}
-    assert mock_get.called
-    assert "weather" in mock_get.call_args[0][0]
+    @patch.object(WeatherAPI, '_make_request')
+    def test_get_weather_daily(self, mock_make_request):
+        """Test get_weather with daily forecast request."""
+        mock_make_request.return_value = {'daily': 'forecast'}
+        
+        weather_api = WeatherAPI()
+        result = weather_api.get_weather("daily", "London")
+        
+        assert result == {'daily': 'forecast'}
+        mock_make_request.assert_called_once_with(
+            f"{weather_api.base_url}forecast/daily",
+            {'q': 'London', 'units': 'metric', 'cnt': 16}
+        )
 
+    @patch.object(WeatherAPI, '_make_request')
+    def test_get_weather_hourly(self, mock_make_request):
+        """Test get_weather with hourly forecast request."""
+        mock_make_request.return_value = {'hourly': 'forecast'}
+        
+        weather_api = WeatherAPI()
+        result = weather_api.get_weather("hourly", "Paris")
+        
+        assert result == {'hourly': 'forecast'}
+        mock_make_request.assert_called_once_with(
+            f"{weather_api.base_url}forecast/hourly",
+            {'q': 'Paris', 'units': 'metric'}
+        )
 
-@patch("core.utils.weather_api.requests.get")
-def test_get_daily_forecast(mock_get, api):
-    mock_get.return_value.status_code = 200
-    mock_get.return_value.json.return_value = {"forecast": "rain"}
+    @patch.object(WeatherAPI, '_make_request')
+    def test_get_weather_historical(self, mock_make_request):
+        """Test get_weather with historical data request."""
+        mock_make_request.return_value = {'history': 'data'}
+        test_date = datetime(2023, 1, 1)
+        
+        weather_api = WeatherAPI()
+        result = weather_api.get_weather("historical", "Berlin", date=test_date, days=3)
+        
+        assert result == {'history': 'data'}
+        expected_params = {
+            'q': 'Berlin',
+            'units': 'metric',
+            'date': test_date,
+            'days': 3,
+            'start': int(test_date.timestamp()),
+            'end': int(test_date.timestamp()) + 3 * 86400
+        }
+        mock_make_request.assert_called_once_with(
+            f"{weather_api.history_url}city",
+            expected_params
+        )
 
-    result = api.get_weather("daily_forecast", "Paris")
-    assert result["forecast"] == "rain"
-
-
-@patch("core.utils.weather_api.requests.get")
-def test_get_hourly_forecast(mock_get, api):
-    mock_get.return_value.status_code = 200
-    mock_get.return_value.json.return_value = {"hourly": True}
-
-    result = api.get_weather("hourly_forecast", "Berlin")
-    assert result["hourly"] is True
-
-
-@patch("core.utils.weather_api.requests.get")
-def test_get_historical_weather(mock_get, api):
-    mock_get.return_value.status_code = 200
-    mock_get.return_value.json.return_value = {"history": "data"}
-
-    test_date = datetime(2024, 1, 1)
-    result = api.get_weather("historical", "Tokyo", date=test_date, days=2)
-    assert "history" in result
-
-
-@patch("core.utils.weather_api.requests.get")
-def test_invalid_request_type_raises(api, mock_get):
-    with pytest.raises(ValueError):
-        api.get_weather("invalid_type", "Madrid")
+    def test_get_weather_invalid_type(self):
+        """Test get_weather with invalid request type."""
+        weather_api = WeatherAPI()
+        with pytest.raises(ValueError, match="Nieprawidłowy typ żądania"):
+            weather_api.get_weather("invalid_type", "Madrid")

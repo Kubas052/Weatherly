@@ -7,8 +7,8 @@
     <title>Weatherly - {% block title %}Aplikacja Pogodowa{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
-    {% block extra_css %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'core/static/core/css/style.css' %}">
+    
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
@@ -22,16 +22,57 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'index' %}">Strona Główna</a>
+                        <a class="nav-link" href="#">O Aplikacji</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">O Aplikacji</a>
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                            <i class="fas fa-cog me-1"></i>Settings
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel"><i class="fas fa-cog me-2"></i>Ustawienia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="settingsForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="cityInput" class="form-label"><i class="fas fa-city me-2"></i>Twoje miasto</label>
+                            <input type="text" class="form-control" id="cityInput" name="city" placeholder="Wprowadź nazwę miasta">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-ruler-combined me-2"></i>Jednostki temperatury</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="temperature_unit" id="celsiusRadio" value="celsius" checked>
+                                <label class="form-check-label" for="celsiusRadio">
+                                    Stopnie Celsiusza (°C)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="temperature_unit" id="fahrenheitRadio" value="fahrenheit">
+                                <label class="form-check-label" for="fahrenheitRadio">
+                                    Stopnie Fahrenheita (°F)
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-primary" id="saveSettings">Zapisz zmiany</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <main class="container">
         {% block content %}{% endblock %}
     </main>
@@ -43,7 +84,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'core/js/script.js' %}"></script>
     {% block extra_js %}{% endblock %}
+
 </body>
 </html>

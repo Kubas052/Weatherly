@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Prognoza dzienna dla {{ city|title }}</title>
+    <title>Prognoza dzienna dla {{ city }}</title>
     <style>
         .chart-container {
             width: 100%;
@@ -64,7 +64,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Dane z Django
             const forecastData = {{ forecast_data|safe }};
-            const cityData = {{ city|safe }};
+            const cityData = {{ city_data|safe }};
 
             if (forecastData && forecastData.length > 0) {
                 drawDailyChart(forecastData, cityData);
@@ -109,16 +109,16 @@
                 ctx.fillStyle = '#555';
                 ctx.font = '12px Arial';
                 const ySteps = 5;
-                
+
                 for (let i = 0; i <= ySteps; i++) {
                     const temp = minTemp + (i / ySteps) * tempRange;
                     const y = scaleY(temp);
-                    
+
                     ctx.beginPath();
                     ctx.moveTo(padding - 5, y);
                     ctx.lineTo(padding, y);
                     ctx.stroke();
-                    
+
                     ctx.fillText(temp.toFixed(0) + "°C", padding - 10, y + 4);
                 }
 
@@ -127,7 +127,7 @@
                 dates.forEach((date, i) => {
                     const x = padding + (i / (dates.length - 1)) * chartWidth;
                     ctx.fillText(date.substring(0, 3), x, canvas.height - padding + 20);
-                    
+
                     ctx.beginPath();
                     ctx.moveTo(x, canvas.height - padding);
                     ctx.lineTo(x, canvas.height - padding + 5);
@@ -139,11 +139,11 @@
                     ctx.beginPath();
                     ctx.strokeStyle = color;
                     ctx.lineWidth = width;
-                    
+
                     values.forEach((value, i) => {
                         const x = padding + (i / (values.length - 1)) * chartWidth;
                         const y = scaleY(value);
-                        
+
                         if (i === 0) {
                             ctx.moveTo(x, y);
                         } else {
@@ -182,10 +182,10 @@
 
                 data.forEach(day => {
                     const row = document.createElement('tr');
-                    
+
                     // Ikona pogody
                     const iconUrl = `https://openweathermap.org/img/wn/${day.icon}@2x.png`;
-                    
+
                     row.innerHTML = `
                         <td>${day.date}</td>
                         <td>${day.day_name}</td>
@@ -199,7 +199,7 @@
                             ${day.description}
                         </td>
                     `;
-                    
+
                     tableBody.appendChild(row);
                 });
             }

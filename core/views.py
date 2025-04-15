@@ -104,7 +104,8 @@ def weather_view(request):
                 })
 
             context = {
-                'city': weather_data['city'],  # Używamy pełnych danych miasta z API
+                'city': city,
+                'city_data': weather_data['city'],  # Używamy pełnych danych miasta z API
                 'forecast_data': forecast_list,
                 'success': True
             }
@@ -133,6 +134,7 @@ def weather_view(request):
                     })
                 context = {
                     'city': city,
+                    'city_data': weather_data['city'],  # Używamy pełnych danych miasta z API
                     'forecast_data': forecast_list,
                     'success': True
                 }
