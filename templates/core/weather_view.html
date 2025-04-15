@@ -1,7 +1,7 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Pogoda dla {{ city }}{% endblock %}
+{% block title %}Weather for {{ city }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -10,7 +10,7 @@
             <div class="card-header bg-primary text-white">
                 <h2 class="text-center mb-0">
                     <i class="fas fa-cloud-sun me-2"></i>
-                    Pogoda dla: {{ city }}
+                    Weather for: {{ city }}
                 </h2>
             </div>
 
@@ -26,13 +26,13 @@
                     <div class="col-md-6">
                         <div class="p-3">
                             <i class="fas fa-tint me-2"></i>
-                            Wilgotność: {{ humidity }}%
+                            Humidity: {{ humidity }}%
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="p-3">
                             <i class="fas fa-wind me-2"></i>
-                            Wiatr: {{ wind_speed }} km/h
+                            Wind speed: {{ wind_speed }} km/h
                         </div>
                     </div>
                 </div>

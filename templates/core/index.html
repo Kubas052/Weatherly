@@ -8,19 +8,19 @@
     <div class="col-md-8">
         <div class="card shadow-lg">
             <div class="card-header bg-info text-white">
-                <h2 class="text-center mb-0"><i class="fas fa-search-location me-2"></i>Wyszukaj Miejscowość</h2>
+                <h2 class="text-center mb-0"><i class="fas fa-search-location me-2"></i>Your City is here</h2>
             </div>
             <div class="card-body">
-                <form method="get" action="{% url 'weather_view' %}" class="needs-validation" novalidate> #GET HERE
+                <form method="get" action="{% url 'weather_view' %}" class="needs-validation" novalidate>
                     {% csrf_token %}
                     <input type="hidden" name="view_type" id="viewTypeInput" value="">
                     <input type="hidden" name="historical_start_date" id="historicalStartDate" value="">
                     <input type="hidden" name="historical_length" id="historicalLength" value="">
                     <div class="input-group mb-3">
                         <input type="text" class="form-control form-control-lg"
-                               name="city" placeholder="Wpisz nazwę miejscowości..." required>
+                               name="city" placeholder="Please enter your city..." required>
                         <button class="btn btn-primary btn-lg" type="submit">
-                            <i class="fas fa-search me-1"></i> Szukaj
+                            <i class="fas fa-search me-1"></i> Search
                         </button>
                     </div>
                 </form>
@@ -86,14 +86,14 @@
                     const forecastFields = document.getElementById('forecastFields');
                     const historicalFields = document.getElementById('historicalFields');
                     const weatherForm = document.querySelector('form');
-                    
+
                     document.addEventListener('DOMContentLoaded', function() {
                         const today = new Date();
                         const formattedDate = today.toISOString().split('T')[0];
                         document.getElementById('historicalDate').value = formattedDate;
-                        
+
                         document.getElementById('historicalDays').value = '1';
-                        
+
                         document.getElementById('historicalStartDate').value = formattedDate;
                         document.getElementById('historicalLength').value = '1';
                     });
@@ -101,7 +101,7 @@
                     // Ustaw domyślną wartość na 'current'
                     viewTypeInput.value = 'current';
                     document.querySelector('[data-type="current"]').classList.replace('btn-outline-primary', 'btn-primary');
-                
+
                     // Obsługa przycisków
                     buttons.forEach(btn => {
                         btn.addEventListener('click', () => {
@@ -109,13 +109,13 @@
                                 b.classList.remove('btn-primary');
                                 b.classList.add('btn-outline-primary');
                             });
-                
+
                             btn.classList.remove('btn-outline-primary');
                             btn.classList.add('btn-primary');
-                            
+
                             const type = btn.getAttribute('data-type');
                             viewTypeInput.value = type;
-                
+
                             if (type === 'historical') {
                                 historicalFields.style.display = 'block';
                                 forecastFields.style.display = 'none';
@@ -128,7 +128,7 @@
                             }
                         });
                     });
-                
+
                     // Walidacja i ustawienie wartości przed wysłaniem formularza
                     weatherForm.addEventListener('submit', function(e) {
                         // Jeśli wybrano historical, sprawdź poprawność danych
@@ -137,14 +137,14 @@
                             const selectedDate = new Date(historicalDate.value);
                             const oneYearAgo = new Date();
                             oneYearAgo.setFullYear(today.getFullYear() - 1);
-                            
+
                             // Sprawdź czy data jest w zakresie ostatniego roku
                             if (selectedDate > today || selectedDate < oneYearAgo) {
                                 historicalDate.classList.add('is-invalid');
                                 e.preventDefault();
                                 return false;
                             }
-                            
+
                             // Sprawdź liczbę dni
                             const days = parseInt(historicalDays.value);
                             if (isNaN(days) || days < 1 || days > 7) {
@@ -152,20 +152,20 @@
                                 e.preventDefault();
                                 return false;
                             }
-                            
+
                             // Ustaw wartości
                             historicalStartDate.value = historicalDate.value;
                             historicalLength.value = days;
                         }
-                        
+
                         return true;
                     });
-                
+
                     // Resetowanie walidacji przy zmianie wartości
                     historicalDate.addEventListener('input', function() {
                         this.classList.remove('is-invalid');
                     });
-                    
+
                     historicalDays.addEventListener('input', function() {
                         this.classList.remove('is-invalid');
                     });

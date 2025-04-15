@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Prognoza temperatury dla {{ city|title }}</title>
+    <title>Historical data for {{ city|title }}</title>
     <style>
         .chart-container {
             width: 100%;
@@ -31,7 +31,7 @@
     </style>
 </head>
 <body>
-    <h1>Historia temperatury dla <span id="city-name">{{ city|title }}</span></h1>
+    <h1>Historical temperature for <span id="city-name">{{ city|title }}</span></h1>
 
     <div class="chart-container">
         <canvas id="temperatureChart"></canvas>
@@ -40,12 +40,12 @@
     <table id="forecast-table">
         <thead>
             <tr>
-                <th>Godzina</th>
-                <th>Temperatura (°C)</th>
-                <th>Odczuwalna</th>
-                <th>Wilgotność (%)</th>
-                <th>Wiatr (km/h)</th>
-                <th>Opis</th>
+                <th>Date</th>
+                <th>Temperature (°C)</th>
+                <th>Feels Like</th>
+                <th>Humidity (%)</th>
+                <th>Wind (km/h)</th>
+                <th>Description</th>
             </tr>
         </thead>
         <tbody>
@@ -168,18 +168,18 @@
                 ctx.fillStyle = '#e74c3c';
                 ctx.fillRect(canvas.width - 150, 20, 20, 10);
                 ctx.fillStyle = '#333';
-                ctx.fillText('Temperatura', canvas.width - 120, 30);
+                ctx.fillText('Temperature', canvas.width - 120, 30);
 
                 ctx.fillStyle = '#3498db';
                 ctx.fillRect(canvas.width - 150, 40, 20, 10);
                 ctx.fillStyle = '#333';
-                ctx.fillText('Odczuwalna', canvas.width - 120, 50);
+                ctx.fillText('Feels like', canvas.width - 120, 50);
 
                 // Tytuł wykresu
                 ctx.fillStyle = '#333';
                 ctx.font = 'bold 16px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText(`Historia temperatury dla ${city}`, canvas.width / 2, 30);
+                ctx.fillText(`Historical temperature for ${city}`, canvas.width / 2, 30);
             }
 
             // Funkcja do wypełniania tabeli

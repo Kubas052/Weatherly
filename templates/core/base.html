@@ -22,7 +22,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">O Aplikacji</a>
+                        <a class="nav-link" href="#">About app</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">
@@ -39,28 +39,28 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="settingsModalLabel"><i class="fas fa-cog me-2"></i>Ustawienia</h5>
+                    <h5 class="modal-title" id="settingsModalLabel"><i class="fas fa-cog me-2"></i>Settings</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="settingsForm">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="cityInput" class="form-label"><i class="fas fa-city me-2"></i>Twoje miasto</label>
-                            <input type="text" class="form-control" id="cityInput" name="city" placeholder="Wprowadź nazwę miasta">
+                            <label for="cityInput" class="form-label"><i class="fas fa-city me-2"></i>Your city</label>
+                            <input type="text" class="form-control" id="cityInput" name="city" placeholder="Please enter your city">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-ruler-combined me-2"></i>Jednostki temperatury</label>
+                            <label class="form-label"><i class="fas fa-ruler-combined me-2"></i>Temperature units</label>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="temperature_unit" id="celsiusRadio" value="celsius" checked>
                                 <label class="form-check-label" for="celsiusRadio">
-                                    Stopnie Celsiusza (°C)
+                                    Celcius (°C)
                                 </label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="temperature_unit" id="fahrenheitRadio" value="fahrenheit">
                                 <label class="form-check-label" for="fahrenheitRadio">
-                                    Stopnie Fahrenheita (°F)
+                                    Fahrenheit (°F)
                                 </label>
                             </div>
                         </div>
@@ -79,7 +79,7 @@
 
     <footer class="bg-light mt-5 py-4">
         <div class="container text-center">
-            <p class="mb-0">&copy; {% now "Y" %} Weatherly - Aplikacja Pogodowa</p>
+            <p class="mb-0">&copy; {% now "Y" %} Weatherly - Weather App</p>
         </div>
     </footer>
 

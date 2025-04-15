@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Prognoza dzienna dla {{ city }}</title>
+    <title>Daily forecast for {{ city }}</title>
     <style>
         .chart-container {
             width: 100%;
@@ -36,7 +36,7 @@
     </style>
 </head>
 <body>
-    <h1>Prognoza dzienna dla <span id="city-name">{{ city|title }}</span></h1>
+    <h1>Daily forecast for <span id="city-name">{{ city|title }}</span></h1>
 
     <div class="chart-container">
         <canvas id="temperatureChart"></canvas>
@@ -45,14 +45,14 @@
     <table id="forecast-table">
         <thead>
             <tr>
-                <th>Data</th>
-                <th>Dzień</th>
+                <th>Date</th>
+                <th>Day</th>
                 <th>Max (°C)</th>
                 <th>Min (°C)</th>
-                <th>Noc (°C)</th>
-                <th>Wilgotność</th>
-                <th>Wiatr (km/h)</th>
-                <th>Pogoda</th>
+                <th>Night (°C)</th>
+                <th>Humidity (%)</th>
+                <th>Wind (km/h)</th>
+                <th>Description</th>
             </tr>
         </thead>
         <tbody>
@@ -165,15 +165,15 @@
                     ctx.fillText(text, x + 30, y + 8);
                 }
 
-                createLegend('Maksymalna', '#e74c3c', canvas.width - 180, 30);
-                createLegend('Minimalna', '#3498db', canvas.width - 180, 50);
-                createLegend('Nocna', '#9b59b6', canvas.width - 180, 70);
+                createLegend('Max', '#e74c3c', canvas.width - 180, 30);
+                createLegend('Min', '#3498db', canvas.width - 180, 50);
+                createLegend('Night', '#9b59b6', canvas.width - 180, 70);
 
                 // Tytuł
                 ctx.fillStyle = '#333';
                 ctx.font = 'bold 18px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText(`Prognoza dzienna dla ${cityData.name}`, canvas.width / 2, 30);
+                ctx.fillText(`Daily forecast for ${cityData.name}`, canvas.width / 2, 30);
             }
 
             function populateDailyTable(data) {
