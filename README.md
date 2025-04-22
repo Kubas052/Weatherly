@@ -1,6 +1,7 @@
 # Weatherly 🌦️
 
 Weatherly is a Django-based web application that provides weather information by interacting with the OpenWeatherMap API. 
+Almost all the frontend was made with ChatGPT, I was responsible for backend and integration.
 The application allows users to view current weather conditions, daily and hourly forecasts, as well as historical (1 year prior) weather data for any city worldwide.
 
 ## Table of Contents
