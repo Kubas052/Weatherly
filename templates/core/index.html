@@ -11,7 +11,7 @@
                 <h2 class="text-center mb-0"><i class="fas fa-search-location me-2"></i>Your City is here</h2>
             </div>
             <div class="card-body">
-                <form method="get" action="{% url 'weather_view' %}" class="needs-validation" novalidate id="weatherForm">
+                <form method="POST" action="{% url 'weather_view' %}" class="needs-validation" novalidate id="weatherForm">
                     {% csrf_token %}
                     <input type="hidden" name="view_type" id="viewTypeInput" value="">
                     <input type="hidden" name="historical_start_date" id="historicalStartDate" value="">

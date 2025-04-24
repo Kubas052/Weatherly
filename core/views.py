@@ -13,15 +13,14 @@ def weather_view(request):
     context = {'success': False}
 
     try:
-        city = request.GET.get('city')  or 'Warsaw'
-        historical_start_date = request.GET.get('historical_start_date') or 'None'
-        historical_length = int(request.GET.get('historical_length')) or 'None'
-        view_type = request.GET.get('view_type') or 'current'
+        city = request.POST.get('city')  or 'Warsaw'
+        historical_start_date = request.POST.get('historical_start_date') or 'None'
+        historical_length = int(request.POST.get('historical_length')) or 'None'
+        view_type = request.POST.get('view_type') or 'current'
 
         api = WeatherAPI()
 
         if view_type == 'current':
-            print("WYKONALA SIE SEKCJA CURRENT")
             weather_data = api.get_weather(view_type, city)
             context = {
                 'city': city,
@@ -34,11 +33,9 @@ def weather_view(request):
             }
             return render(request, 'core/weather_view.html', context)
         elif view_type == 'historical':
-            print("WYKONALA SIE SEKCJA HISTORICAL")
             if not historical_start_date:
                 raise ValidationError("Historical start date is required")
             date_obj = datetime.strptime(historical_start_date, '%Y-%m-%d')
-            print(f"Przekazywana data do WeatherAPI: {date_obj.isoformat()}")
             weather_data = api.get_weather(
                 view_type,
                 city,
@@ -76,7 +73,6 @@ def weather_view(request):
                 return JsonResponse(context)
             return render(request, 'core/historical_view.html', context)
         elif view_type == 'daily':
-            print("WYKONALA SIE SEKCJA DAILY")
             weather_data = api.get_weather(view_type, city)
             forecast_list = []
 
@@ -109,10 +105,8 @@ def weather_view(request):
                 'forecast_data': forecast_list,
                 'success': True
             }
-            print(forecast_list)
             return render(request, 'core/forecast_daily_view.html', context)
         elif view_type == 'hourly':
-            print("WYKONALA SIE SEKCJA HOURLY")
             weather_data = api.get_weather(view_type, city)
             forecast_list = []
             for i, hour_data in enumerate(weather_data['list']):

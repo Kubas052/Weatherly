@@ -25,15 +25,15 @@ class WeatherAPI:
         Returns:
             dict: JSON response from the API.
         """
-
         if params is None:
             params = {}
+
         params["appid"] = self.api_key
         response = requests.get(endpoint, params=params, timeout=10)
-        response.raise_for_status()
-        print("wykonuje sie _make_request()")
-        print(response.url)
-        print(response.status_code)
+        if response.status_code != 200:
+            if response.status_code == 404:
+                raise ValueError("Not found")
+            #there should be more status_codes but app doesnt work on different api_key subscription
         return response.json()
 
     def get_weather(self, request_type, city, **kwargs):
@@ -68,7 +68,6 @@ class WeatherAPI:
 
         else:
             raise ValueError("Nieprawidłowy typ żądania")
-
         params.update(kwargs)
-        print(f"parametry to: {params}")
+        # print(f"parametry to: {params}")
         return self._make_request(endpoint, params)
