@@ -11,14 +11,13 @@
                 <h2 class="text-center mb-0"><i class="fas fa-search-location me-2"></i>Your City is here</h2>
             </div>
             <div class="card-body">
-                <form method="get" action="{% url 'weather_view' %}" class="needs-validation" novalidate>
+                <form method="get" action="{% url 'weather_view' %}" class="needs-validation" novalidate id="weatherForm">
                     {% csrf_token %}
                     <input type="hidden" name="view_type" id="viewTypeInput" value="">
                     <input type="hidden" name="historical_start_date" id="historicalStartDate" value="">
                     <input type="hidden" name="historical_length" id="historicalLength" value="">
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control form-control-lg"
-                               name="city" placeholder="Please enter your city..." required>
+                        <input type="text" class="form-control form-control-lg" name="city" placeholder="Please enter your city..." required>
                         <button class="btn btn-primary btn-lg" type="submit">
                             <i class="fas fa-search me-1"></i> Search
                         </button>
@@ -30,6 +29,7 @@
                     {{ error }}
                 </div>
                 {% endif %}
+
                 <div class="container mt-4" id="weatherDiv">
                     <!-- Przełącznik -->
                     <div class="btn-group w-100 mb-4" role="group" id="weatherToggle">
@@ -42,11 +42,8 @@
                             <button class="btn btn-outline-primary" data-type="historical">
                                 <i class="fas fa-history"></i> Historical
                             </button>
-{#                            <button class="btn btn-outline-primary" data-type="maps">#}
-{#                                <i class="fas fa-calendar-alt"></i> Maps#}
-{#                            </button>#}
                     </div>
-{#                    TODO do it in 1 div, not cols#}
+
                     <div id="forecastFields" style="display: none;" class="mt-3">
                         <div class="row">
                             <div class="col-md-6">
@@ -85,15 +82,13 @@
                     const historicalDays = document.getElementById('historicalDays');
                     const forecastFields = document.getElementById('forecastFields');
                     const historicalFields = document.getElementById('historicalFields');
-                    const weatherForm = document.querySelector('form');
+                    const weatherForm = document.getElementById('weatherForm');
 
                     document.addEventListener('DOMContentLoaded', function() {
                         const today = new Date();
                         const formattedDate = today.toISOString().split('T')[0];
                         document.getElementById('historicalDate').value = formattedDate;
-
                         document.getElementById('historicalDays').value = '1';
-
                         document.getElementById('historicalStartDate').value = formattedDate;
                         document.getElementById('historicalLength').value = '1';
                     });
@@ -129,23 +124,27 @@
                         });
                     });
 
-                    // Walidacja i ustawienie wartości przed wysłaniem formularza
+                    // Dodane logowanie na początku
                     weatherForm.addEventListener('submit', function(e) {
-                        // Jeśli wybrano historical, sprawdź poprawność danych
+                        console.log("Formularz próbuje wysłać dane");
+                        
+                        // Logowanie danych przed wysłaniem formularza
+                        console.log("viewTypeInput.value:", viewTypeInput.value);
+                        console.log("historicalStartDate.value:", historicalStartDate.value);
+                        console.log("historicalLength.value:", historicalLength.value);
+
                         if (viewTypeInput.value === 'historical') {
                             const today = new Date();
                             const selectedDate = new Date(historicalDate.value);
                             const oneYearAgo = new Date();
                             oneYearAgo.setFullYear(today.getFullYear() - 1);
 
-                            // Sprawdź czy data jest w zakresie ostatniego roku
                             if (selectedDate > today || selectedDate < oneYearAgo) {
                                 historicalDate.classList.add('is-invalid');
                                 e.preventDefault();
                                 return false;
                             }
 
-                            // Sprawdź liczbę dni
                             const days = parseInt(historicalDays.value);
                             if (isNaN(days) || days < 1 || days > 7) {
                                 historicalDays.classList.add('is-invalid');
@@ -153,11 +152,16 @@
                                 return false;
                             }
 
-                            // Ustaw wartości
                             historicalStartDate.value = historicalDate.value;
                             historicalLength.value = days;
+
+                            // Sprawdzenie wartości po przypisaniu
+                            console.log("Po ustawieniu wartości:");
+                            console.log("historicalStartDate.value:", historicalStartDate.value);
+                            console.log("historicalLength.value:", historicalLength.value);
                         }
 
+                        // Jeśli nic nie blokuje formularza, zwróć true
                         return true;
                     });
 
@@ -172,8 +176,7 @@
                 </script>
             </div>
         </div>
-
-{#        {% if recent_searches %}#}
+    {#        {% if recent_searches %}#}
 {#        <div class="card mt-4 shadow-sm">#}
 {#            <div class="card-header bg-light">#}
 {#                <h5 class="mb-0">Ostatnie wyszukiwania</h5>#}
